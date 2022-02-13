@@ -26,7 +26,6 @@ function init() {
           "View All Employees",
           "Add Employee",
           "Update Employee",
-          "Remove Employee",
           "View all Employees By Department",
           "Add Department",
           "View All Departments",
@@ -54,6 +53,21 @@ function init() {
         case "Add Employee":
           addEmployee();
           break;
+        case "Add Role":
+          addRole();
+          break;
+        case "Remove Role":
+          deleteRole();
+          break;
+        case "Add Department":
+          addDepartment();
+          break;
+        case "View All Departments":
+          viewAllDepartments();
+          break;
+        case "Remove Department":
+          deleteDepartment();
+          break;
         default:
           init();
           break;
@@ -61,7 +75,6 @@ function init() {
     });
 }
 
-// view all employees
 function viewAllEmployees() {
   connection.query(`SELECT * FROM employee`, (err, res) => {
     if (err) throw err;
@@ -69,7 +82,7 @@ function viewAllEmployees() {
     init();
   });
 }
-// view all employee's by role
+
 function viewAllEmployeesByRoles() {
   connection.query(
     `SELECT title, id, salary, department_id FROM role`,
@@ -80,7 +93,7 @@ function viewAllEmployeesByRoles() {
     }
   );
 }
-// view all employees by department
+
 function viewAllEmployeesByDepartments() {
   connection.query(`SELECT id, name FROM department`, (err, res) => {
     if (err) throw err;
@@ -89,7 +102,6 @@ function viewAllEmployeesByDepartments() {
   });
 }
 
-// update employee
 function updateEmployee() {
   inquirer
     .prompt([
@@ -145,6 +157,138 @@ function addEmployee() {
       connection.query(
         `INSERT INTO employee (first_name, last_name, role_id, manager_id) VALUES (?,?,?,?);`,
         [input.first_name, input.last_name, input.id, input.manager_id],
+        (err, res) => {
+          if (err) throw err;
+          console.table(res);
+          init();
+        }
+      );
+    });
+}
+
+function addRole() {
+  inquirer
+    .prompt([
+      {
+        type: "input",
+        message: "Role Title",
+        name: "name",
+      },
+      {
+        type: "input",
+        message: "Salary",
+        name: "salary",
+      },
+      {
+        type: "input",
+        message: "Department ID",
+        name: "department_id",
+      },
+    ])
+    .then((input) => {
+      connection.query(
+        `INSERT INTO role (title, salary, department_id) VALUES (?,?,?);`,
+        [input.name, input.salary, input.department_id],
+        (err, res) => {
+          if (err) throw err;
+          init();
+        }
+      );
+    });
+}
+
+function addDepartment() {
+  inquirer
+    .prompt([
+      {
+        type: "input",
+        message: "Department Name",
+        name: "name",
+      },
+    ])
+    .then((input) => {
+      connection.query(
+        `INSERT INTO department (name) VALUES (?);`,
+        [input.name],
+        (err, res) => {
+          if (err) throw err;
+          console.table(res);
+          init();
+        }
+      );
+    });
+}
+
+function deleteEmployee() {
+  inquirer
+    .prompt([
+      {
+        type: "input",
+        message: "First Name",
+        name: "first_name",
+      },
+      {
+        type: "input",
+        message: "Last Name",
+        name: "last_name",
+      },
+    ])
+    .then((input) => {
+      connection.query(
+        `DELETE FROM employee WHERE first_name=? AND last_name=?;`,
+        [input.first_name, input.last_name],
+        (err, res) => {
+          if (err) throw err;
+          console.table(res);
+          init();
+        }
+      );
+    });
+}
+
+function deleteDepartment() {
+  inquirer
+    .prompt([
+      {
+        type: "input",
+        message: "Department Name",
+        name: "name",
+      },
+    ])
+    .then((input) => {
+      connection.query(
+        `DELETE FROM department WHERE name=?;`,
+        [input.name],
+        (err, res) => {
+          if (err) throw err;
+          console.table(res);
+          init();
+        }
+      );
+    });
+}
+
+function viewAllDepartments() {
+  connection.query("SELECT * FROM department", (err, res) => {
+    if (err) throw err;
+    console.table(res);
+    init();
+  });
+}
+
+function deleteRole() {
+  inquirer
+    .prompt([
+      {
+        type: "input",
+        message: "Role Title",
+        name: "title",
+      },
+    ])
+    .then((input) => {
+      connection.query(
+        "DELETE FROM role WHERE title= ?;",
+        [input.title],
         (err, res) => {
           if (err) throw err;
           console.table(res);
