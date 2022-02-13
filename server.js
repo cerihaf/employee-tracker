@@ -1,17 +1,38 @@
-const express = require('express');
-const routes = require('./routes');
-const sequelize = require('./config/connection');
+const inquirer = require("inquirer");
+const mysql = require("mysql2");
 
-const app = express();
-const PORT = process.env.PORT || 3001;
-
-app.use(express.json());
-app.use(express.urlencoded({ extended: true }));
-
-// turn on routes
-app.use(routes);
-
-// turn on connection to db and server
-sequelize.sync({ force: false }).then(() => {
-  app.listen(PORT, () => console.log('Now listening'));
+const connection = mysql.createConnection({
+  host: "127.0.0.1",
+  port: 3306,
+  user: "root",
+  password: "password",
+  database: "employees_db",
 });
+
+connection.connect(function (err) {
+  if (err) throw err;
+  init();
+});
+
+function init() {
+  inquirer.prompt([
+    {
+      type: "list",
+      message: "Select an option",
+      name: "choice",
+      choices: [
+        "View All Employees",
+        "View all Employees By Department",
+        "View All Employees By Role",
+        "Update Employee",
+        "Add Employee",
+        "Remove Employee",
+        "View All Departments",
+        "Add Department",
+        "Remove Department",
+        "Add Role",
+        "Remove Role",
+      ],
+    },
+  ]);
+}
